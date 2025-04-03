@@ -19,10 +19,11 @@ def extract_xhamster_link(url):
         return None
     
     soup = BeautifulSoup(response.text, "html.parser")
-    
-    # Search for direct MP4 link
-    match = re.search(r'https://.*?xhamster\.com/.*?\.mp4', response.text)
+
+    # Search for direct MP4 link in HTML
+    match = re.search(r'https://[^"]+\.mp4', response.text)
     video_link = match.group(0) if match else None
+
     print(f"[INFO] Extracted XHamster Video Link: {video_link}")
     return video_link
 
@@ -32,15 +33,16 @@ def send_welcome(message):
     bot.reply_to(message, "Send me an XHamster video link!")
 
 # Handle video links
-@bot.message_handler(func=lambda message: message.text.startswith("http"))
-def download_xhamster_video(message):
+@bot.message_handler(func=lambda message: True)
+def process_video_request(message):
     url = message.text.strip()
-    
-    print(f"[INFO] Received link from user {message.chat.id}: {url}")
-    bot.reply_to(message, "Fetching video, please wait...")
+
+    print(f"[DEBUG] Received message: {url}")  # Debugging
+    bot.reply_to(message, "🔄 Fetching video, please wait...")
 
     if "xhamster.com" not in url:
         bot.reply_to(message, "❌ Unsupported website. Please send a valid XHamster link.")
+        print("[DEBUG] URL does not contain 'xhamster.com'")
         return
 
     try:
@@ -48,6 +50,7 @@ def download_xhamster_video(message):
 
         if not video_url:
             bot.reply_to(message, "❌ Could not extract video link. Please check your URL.")
+            print("[ERROR] No video link found")
             return
 
         bot.reply_to(message, f"✅ Downloading video from: {video_url}")
