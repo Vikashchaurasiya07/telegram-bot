@@ -2,72 +2,45 @@ import telebot
 import requests
 import os
 import re
-from bs4 import BeautifulSoup
 
 # Replace with your Telegram bot token
 BOT_TOKEN = "7754481758:AAFznAKN05qP33QljoT-WIXaS9GD7zne4rA"
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Function to extract Terabox video link
-def extract_terabox_link(url):
+# Function to extract XHamster video link
+def extract_xhamster_link(url):
     headers = {"User-Agent": "Mozilla/5.0"}
     
-    print(f"[INFO] Fetching Terabox URL: {url}")
+    print(f"[INFO] Fetching XHamster URL: {url}")
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
-        print(f"[ERROR] Failed to fetch Terabox page. Status: {response.status_code}")
+        print(f"[ERROR] Failed to fetch XHamster page. Status: {response.status_code}")
         return None
     
     # Extract direct video link
-    match = re.search(r'https://.*?terabox\.com/.*?mp4', response.text)
+    match = re.search(r'https://.*?xhamster.com/.*?mp4', response.text)
     video_link = match.group(0) if match else None
-    print(f"[INFO] Extracted Terabox Video Link: {video_link}")
-    return video_link
-
-# Function to extract Diskwala video link
-def extract_diskwala_link(url):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    
-    print(f"[INFO] Fetching Diskwala URL: {url}")
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        print(f"[ERROR] Failed to fetch Diskwala page. Status: {response.status_code}")
-        return None
-    
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    # Find iframe source
-    iframe = soup.find("iframe")
-    if iframe and "src" in iframe.attrs:
-        print(f"[INFO] Found Diskwala Iframe Source: {iframe['src']}")
-        return iframe["src"]
-    
-    # Try direct .mp4 link
-    match = re.search(r'https://.*?diskwala\.com/.*?mp4', response.text)
-    video_link = match.group(0) if match else None
-    print(f"[INFO] Extracted Diskwala Video Link: {video_link}")
+    print(f"[INFO] Extracted XHamster Video Link: {video_link}")
     return video_link
 
 # Start command
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     print(f"[INFO] User {message.chat.id} started the bot.")
-    bot.reply_to(message, "Send me a Terabox or Diskwala video link!")
+    bot.reply_to(message, "Send me an XHamster video link!")
 
 # Handle video links
 @bot.message_handler(func=lambda message: True)
-def download_custom_video(message):
+def download_xhamster_video(message):
     url = message.text
     print(f"[INFO] Received link from user {message.chat.id}: {url}")
     bot.reply_to(message, "Fetching video, please wait...")
 
     try:
-        if "terabox.com" in url:
-            video_url = extract_terabox_link(url)
-        elif "diskwala.com" in url:
-            video_url = extract_diskwala_link(url)
+        if "xhamster.com" in url:
+            video_url = extract_xhamster_link(url)
         else:
-            bot.reply_to(message, "Unsupported website. Please send a Terabox or Diskwala link.")
+            bot.reply_to(message, "Unsupported website. Please send an XHamster link.")
             return
 
         if not video_url:
