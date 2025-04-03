@@ -20,7 +20,7 @@ def extract_xhamster_link(url):
     
     soup = BeautifulSoup(response.text, "html.parser")
 
-    # Search for direct MP4 link in HTML
+    # Look for video link inside HTML
     match = re.search(r'https://[^"]+\.mp4', response.text)
     video_link = match.group(0) if match else None
 
